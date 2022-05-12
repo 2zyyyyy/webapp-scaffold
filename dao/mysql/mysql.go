@@ -29,3 +29,12 @@ func Init() (err error) {
 	db.SetMaxOpenConns(viper.GetInt("mysql.max_idle_cons"))
 	return
 }
+
+// Close 封装db.close方法
+func Close() {
+	err := db.Close()
+	if err != nil {
+		zap.L().Error("mysql close failed.", zap.Error(err))
+		return
+	}
+}

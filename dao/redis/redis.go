@@ -27,3 +27,11 @@ func Init() (err error) {
 	}
 	return
 }
+
+func Close() {
+	err := rdb.Close()
+	if err != nil {
+		zap.L().Error("redis close failed.", zap.Error(err))
+		return
+	}
+}
