@@ -8,8 +8,7 @@ import (
 	"runtime/debug"
 	"strings"
 	"time"
-
-	"github.com/spf13/viper"
+	"webapp-scaffold/settings"
 
 	"github.com/gin-gonic/gin"
 
@@ -22,15 +21,15 @@ import (
 
 var logger *zap.Logger
 
-func Init() (err error) {
+func Init(config *settings.LogConfig) (err error) {
 	writeSyncer := getLogWrite(
-		viper.GetString("log.filename"),
-		viper.GetInt("log.max_size"),
-		viper.GetInt("log.max_age"),
-		viper.GetInt("log.max_backups"))
+		settings.Config.LogConfig.FileName,
+		settings.Config.LogConfig.MaxSize,
+		settings.Config.LogConfig.MaxAge,
+		settings.Config.LogConfig.MaxBackups)
 	encoder := getEncoder()
 	var level = new(zapcore.Level)
-	err = level.UnmarshalText([]byte(viper.GetString("log.level")))
+	err = level.UnmarshalText([]byte(settings.Config.LogConfig.Level))
 	if err != nil {
 		return
 	}
@@ -90,7 +89,8 @@ func GinRecovery(stack bool) gin.HandlerFunc {
 				var brokenPipe bool
 				if ne, ok := err.(*net.OpError); ok {
 					if se, ok := ne.Err.(*os.SyscallError); ok {
-						if strings.Contains(strings.ToLower(se.Error()), "broken pipe") || strings.Contains(strings.ToLower(se.Error()), "connection reset by peer") {
+						if strings.Contains(strings.ToLower(se.Error()), "broken pipe") ||
+							strings.Contains(strings.ToLower(se.Error()), "connection reset by peer") {
 							brokenPipe = true
 						}
 					}

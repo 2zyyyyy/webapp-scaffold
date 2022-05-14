@@ -14,8 +14,6 @@ import (
 	"webapp-scaffold/settings"
 
 	"go.uber.org/zap"
-
-	"github.com/spf13/viper"
 )
 
 func main() {
@@ -24,7 +22,7 @@ func main() {
 		fmt.Println("init setting failed, err:", err)
 	}
 	// 2.初始化日志
-	if err := logger.Init(); err != nil {
+	if err := logger.Init(settings.Config.LogConfig); err != nil {
 		fmt.Println("init logger failed, err:", err)
 	}
 	// 延迟注册zap
@@ -46,7 +44,7 @@ func main() {
 	r := routers.SetUp()
 	// 6.启动服务（优雅关机）
 	server := &http.Server{
-		Addr:    fmt.Sprintf(":%d", viper.GetInt("app.port")),
+		Addr:    fmt.Sprintf(":%d", settings.Config.Port),
 		Handler: r,
 	}
 	zap.L().Info(server.Addr)

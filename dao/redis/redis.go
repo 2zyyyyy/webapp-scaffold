@@ -2,9 +2,9 @@ package redis
 
 import (
 	"fmt"
+	"webapp-scaffold/settings"
 
 	"github.com/go-redis/redis"
-	"github.com/spf13/viper"
 	"go.uber.org/zap"
 )
 
@@ -13,11 +13,11 @@ var rdb *redis.Client
 func Init() (err error) {
 	rdb = redis.NewClient(&redis.Options{
 		Addr: fmt.Sprintf("%s:%d",
-			viper.GetString("redis.host"),
-			viper.GetInt("redis.port")),
-		Password: viper.GetString("redis.password"),
-		DB:       viper.GetInt("redis.db"),
-		PoolSize: viper.GetInt("redis.pool_size"),
+			settings.Config.RedisConfig.Host,
+			settings.Config.RedisConfig.Port),
+		Password: settings.Config.RedisConfig.Password,
+		DB:       settings.Config.RedisConfig.DB,
+		PoolSize: settings.Config.RedisConfig.PoolSize,
 	})
 
 	_, err = rdb.Ping().Result()
