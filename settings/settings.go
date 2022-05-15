@@ -3,6 +3,8 @@ package settings
 import (
 	"fmt"
 
+	"github.com/fsnotify/fsnotify"
+
 	"go.uber.org/zap"
 
 	"github.com/spf13/viper"
@@ -64,5 +66,15 @@ func Init() (err error) {
 	if err := viper.Unmarshal(Config); err != nil {
 		zap.L().Error("配置文件反序列化至结构体失败.", zap.Error(err))
 	}
+
+	// 热更新配置文件
+	viper.WatchConfig()
+	viper.OnConfigChange(func(in fsnotify.Event) {
+		fmt.Println("配置文件修改了...")
+		// 同步修改Config结构体的值
+		if err := viper.Unmarshal(Config); err != nil {
+			zap.L().Error("配置文件反序列化至结构体失败.", zap.Error(err))
+		}
+	})
 	return
 }
